@@ -9,34 +9,45 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         $request->validate([
-            "txt_nama" => "required",
-            "txt_password" => "required",
+            "nama" => "required|string",
+            "password" => "required|string",
+            "username" => "required|string|unique:users"
         ]);
 
         DB::table('users')->insert([
-            'nama' => $request->txt_nama,
-            'username' => $request->txt_username,
-            'password' => Hash::make($request->txt_password),
+            'nama' => $request->nama,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
             'level' => $request->roles
         ]);
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with(['sukses' => "Berhasil Register"]);
     }
 
-    public function login(Request $request){
-        $credential = $request->validate([
-            "username" => "required",
-            "password" => "required",
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            "username" => "required|string",
+            "password" => "required|string",
         ]);
+        $credential = [
+            'username' => $request->username,
+            'password' => $request->password,
+        ];
 
-        if(Auth::attempt($credential)){
+        if (Auth::attempt($credential)) {
             return redirect('/home');
         }
 
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with("error", "Username atau password salah");
+    }
 
+    public function logout(){
+        Auth::logout();
+        return redirect()->route('login');
     }
 }

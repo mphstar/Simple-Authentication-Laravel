@@ -28,7 +28,7 @@ Route::get('/login', function () {
 
 Route::get('/register', function () {
     return view('register');
-})->middleware('checkroles');
+});
 
 Route::post('/proses_register', [AuthController::class, 'register']);
 
@@ -36,6 +36,8 @@ Route::post('/proses_login', [AuthController::class, 'login']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', function () {
-        return "ini homepage " . Auth::user()->username;
+        return view('home');
     });
+
+    Route::get('/logout', [AuthController::class, 'logout']);
 });
